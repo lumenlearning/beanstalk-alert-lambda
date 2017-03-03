@@ -48,10 +48,11 @@ exports.handler = function(event, context) {
 
     var applicationName = prettyApplicationName(awsMessageData['Application']);
 
-    var slackUsername = util.format('AWS %s - %s', BEANSTALK_ENV, applicationName);
-    var slackMessageDetails = createSlackMessageDetails(awsMessageData);
-
     var messageType = getMessageType(awsMessageRaw);
+
+    var usernamePrefix = messageType ? messageType + ' in ' : ''
+    var slackUsername = util.format('%s%s - %s', usernamePrefix, BEANSTALK_ENV, applicationName);
+
     var slackMessagePrefix = messageType ? '*' + messageType + '*: ' : '*'
     var slackMessage = slackMessagePrefix + awsMessageData['Message'];
 
@@ -89,6 +90,8 @@ exports.handler = function(event, context) {
             }
         }
     }
+
+    var slackMessageDetails = createSlackMessageDetails(awsMessageData);
 
     postData.attachments = [{
         "color": severity,
