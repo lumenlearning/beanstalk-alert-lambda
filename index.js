@@ -48,12 +48,11 @@ exports.handler = function(event, context) {
 
     var applicationName = prettyApplicationName(awsMessageData['Application']);
 
+    var slackUsername = util.format('AWS %s - %s', BEANSTALK_ENV, applicationName);
+    var slackMessageDetails = createSlackMessageDetails(awsMessageData);
+
     var messageType = getMessageType(awsMessageRaw);
-
-    var usernamePrefix = messageType ? messageType + ' in ' : ''
-    var slackUsername = util.format('%s%s - %s', usernamePrefix, BEANSTALK_ENV, applicationName);
-
-    var slackMessagePrefix = messageType ? '*' + messageType + '*: ' : ''
+    var slackMessagePrefix = messageType ? '*' + messageType + '*: ' : '*'
     var slackMessage = slackMessagePrefix + awsMessageData['Message'];
 
     var postData = {
@@ -90,8 +89,6 @@ exports.handler = function(event, context) {
             }
         }
     }
-
-    var slackMessageDetails = createSlackMessageDetails(awsMessageData);
 
     postData.attachments = [{
         "color": severity,
@@ -149,17 +146,15 @@ function createSlackMessageDetails(data) {
 function getMessageType(awsMessageRaw) {
     var messageLower = awsMessageRaw.toLowerCase();
 
-    if (messageLower.indexOf('to red') != -1) {
-        return 'DOWN';
-    } else if (messageLower.indexOf('health') != -1) {
-        return 'Health';
-    } else if (messageLower.indexOf('deploy') != -1) {
+    if (messageLower.indexOf('deploy') != -1) {
         return 'Deployment';
     } else if (messageLower.indexOf('rollback') != -1) {
         return 'Rollback';
-    } else {
-        return null;
+    } else if (messageLower.indexOf('environment health has transitioned from') != -1) {
+        return 'Health';
     }
+
+    return null;
 }
 
 function prettyApplicationName(applicationName) {
@@ -171,9 +166,8 @@ function prettyApplicationName(applicationName) {
         return 'MyOpenMath';
     } else if (nameLower.indexOf('openassessments') != -1) {
         return 'OpenAssessments';
-    } else if (nameLower.indexOf('lumom') != -1) {
-        return 'Ohm';
     } else {
         return applicationName;
     }
 }
+
