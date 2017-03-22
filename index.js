@@ -26,7 +26,9 @@ var WARNING_MESSAGES = [
 
 var DANGER_MESSAGES = [
     " but with errors",
+    " to Degraded",
     " to RED",
+    " to Severe",
     "During an aborted deployment",
     "Failed to deploy application",
     "Failed to deploy configuration",
@@ -36,7 +38,9 @@ var DANGER_MESSAGES = [
     "Stack deletion failed",
     "Unsuccessful command execution",
     "You do not have permission",
-    "Your quota allows for 0 more running instance"
+    "Your quota allows for 0 more running instance",
+    "requests to the ELB are failing",
+    
 ];
 
 exports.handler = function(event, context) {
